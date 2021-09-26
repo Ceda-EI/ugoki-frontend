@@ -2,7 +2,10 @@
   <div id="login">
     <card id="login-card">
       <h1>Ugoki</h1>
-      <a-form layout="vertical">
+      <a-form
+        layout="vertical"
+        @submit="login"
+      >
         <form-item>
           <a-input v-model:value="username" placeholder="Username" />
         </form-item>
@@ -19,8 +22,11 @@
 
 <script>
 import { Form, Input, Button, Card  } from "ant-design-vue";
+import { onBeforeMount } from "vue";
+import store from "../store";
+import router from "../router";
 export default {
-  name: 'Login',
+  name: "Login",
   components: {
     aForm: Form,
     aInput: Input,
@@ -38,6 +44,23 @@ export default {
     disabledLogin: function() {
       return this.username === "" || this.password === "";
     }
+  },
+  methods: {
+    login: function() {
+      const auth = {
+        username: this.username,
+        password: this.password
+      };
+      store.dispatch("setCreds", auth);
+      router.push("/suggestions");
+    }
+  },
+  setup() {
+    onBeforeMount(() => {
+      const { username, password } = store.state.auth;
+      if (username !== "" && password !== "")
+        router.push("/suggestions");
+    });
   }
 }
 </script>
