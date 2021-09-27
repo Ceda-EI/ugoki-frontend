@@ -62,6 +62,7 @@ const store = createStore({
           () => {
             localStorage.removeItem("username");
             localStorage.removeItem("password");
+            ctx.commit('setAuth', {username: "", password: ""})
             ctx.commit('setLoading', false);
             ctx.dispatch('showError', "Login Failed");
             router.replace("/");
