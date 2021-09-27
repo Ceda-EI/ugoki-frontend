@@ -71,7 +71,7 @@ export default {
     },
 
     approveSuggestion: (id) => {
-      store.dispatch("setLoading");
+      store.dispatch("showLoading");
       axios.post(`suggestion/${id}`, {}, {
         auth: store.state.auth,
         baseURL: config.API_URL
@@ -81,7 +81,7 @@ export default {
     },
 
     rejectSuggestion: (id) => {
-      store.dispatch("setLoading");
+      store.dispatch("showLoading");
       axios.delete(`suggestion/${id}`, {
         auth: store.state.auth,
         baseURL: config.API_URL
