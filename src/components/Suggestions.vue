@@ -19,12 +19,12 @@
         <template #description>
           {{suggestion.id}}
           <div class="buttons">
-            <a-button type="primary" shape="round">
+            <a-button type="primary" shape="round" @click="() => approveSuggestion(suggestion.id)">
               <template #icon>
                 <CheckOutlined />
               </template>
             </a-button>
-            <a-button danger shape="round">
+            <a-button danger shape="round" @click="() => rejectSuggestion(suggestion.id)">
               <template #icon>
                 <DeleteOutlined />
               </template>
@@ -39,9 +39,11 @@
 <script>
 import store from "../store";
 import router from "../router";
+import config from "../config";
 import { onBeforeMount } from "vue";
 import { Button, Card, PageHeader } from "ant-design-vue";
 import { CheckOutlined, DeleteOutlined } from "@ant-design/icons-vue";
+import axios from "axios";
 
 export default {
   name: "Suggestions",
@@ -66,7 +68,27 @@ export default {
     logout: function() {
       store.dispatch("setCreds", { username: "", password: "" });
       router.push("/");
-    }
+    },
+
+    approveSuggestion: (id) => {
+      store.dispatch("setLoading");
+      axios.post(`suggestion/${id}`, {}, {
+        auth: store.state.auth,
+        baseURL: config.API_URL
+      })
+      .then(() => store.dispatch('getSuggestions'))
+      .catch(() => store.dispatch('getSuggestions'))
+    },
+
+    rejectSuggestion: (id) => {
+      store.dispatch("setLoading");
+      axios.delete(`suggestion/${id}`, {
+        auth: store.state.auth,
+        baseURL: config.API_URL
+      })
+      .then(() => store.dispatch('getSuggestions'))
+      .catch(() => store.dispatch('getSuggestions'))
+    },
   }
 }
 </script>
