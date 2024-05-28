@@ -3,6 +3,15 @@ import axios from "axios";
 import config from "./config";
 import router from "./router";
 
+function handleError(ctx) {
+  localStorage.removeItem("username");
+  localStorage.removeItem("password");
+  ctx.commit('setAuth', {username: "", password: ""})
+  ctx.commit('setLoading', false);
+  ctx.dispatch('showError', "Login Failed");
+  router.replace("/");
+}
+
 const store = createStore({
   state() {
     return {
@@ -12,6 +21,7 @@ const store = createStore({
       },
       loading: false,
       suggestions: [],
+      categories: [],
       alert: {
         show: false,
         type: "",
@@ -34,7 +44,14 @@ const store = createStore({
     },
 
     setSuggestions(state, suggestions) {
-      state.suggestions = suggestions
+      state.suggestions = suggestions;
+    },
+
+    setCategories(state, categories) {
+      state.categories = categories.map(i => ({
+        ...i,
+        title: i.name[0].toUpperCase() + i.name.slice(1),
+      }));
     }
   },
 
@@ -58,17 +75,25 @@ const store = createStore({
             ctx.dispatch('hideAlert');
           }
         )
-        .catch(
-          () => {
-            localStorage.removeItem("username");
-            localStorage.removeItem("password");
-            ctx.commit('setAuth', {username: "", password: ""})
-            ctx.commit('setLoading', false);
-            ctx.dispatch('showError', "Login Failed");
-            router.replace("/");
-          }
-        );
+        .catch(() => handleError(ctx));
     },
+
+    getCategories(ctx) {
+      ctx.commit('setLoading', true);
+      axios.get('categories', {
+        baseURL: config.API_URL,
+        auth: ctx.state.auth,
+      })
+        .then(
+          resp => {
+            ctx.commit('setLoading', false);
+            ctx.commit('setCategories', resp.data);
+            ctx.dispatch('hideAlert');
+          }
+        )
+        .catch(() => handleError(ctx));
+    },
+
 
     showError(ctx, message) {
       ctx.commit("setAlert", {

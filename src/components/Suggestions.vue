@@ -1,11 +1,7 @@
 <template>
-  <page-header
-    title="Ugoki"
-    sub-title="Suggestions"
-    @back="logout"
-  />
-  <h1 v-if="!suggestions.length"> No Suggestions left</h1>
+  <app-header :visible="appHeaderOptions.SUGGESTIONS" subTitle="Suggestions" />
   <div class="suggestions">
+    <h1 v-if="!suggestions.length"> No Suggestions left</h1>
     <card
       hoverable
       class="suggestion"
@@ -38,38 +34,38 @@
 
 <script>
 import store from "../store";
-import router from "../router";
 import config from "../config";
+import { appHeaderOptions } from "../constants";
 import { onBeforeMount } from "vue";
-import { Button, Card, PageHeader } from "ant-design-vue";
+import { Button, Card } from "ant-design-vue";
 import { CheckOutlined, DeleteOutlined } from "@ant-design/icons-vue";
+import AppHeader from "./utils/AppHeader";
 import axios from "axios";
 
 export default {
   name: "Suggestions",
   components: {
-    PageHeader,
     Card,
     CardMeta: Card.Meta,
     AButton: Button,
     CheckOutlined,
     DeleteOutlined,
+    AppHeader,
   },
   setup() {
     onBeforeMount(() => {
-      store.dispatch("showLoading");
       store.dispatch("getSuggestions");
     });
+  },
+  data() {
+    return {
+      appHeaderOptions,
+    };
   },
   computed: {
     suggestions: () => store.state.suggestions,
   },
   methods: {
-    logout: function() {
-      store.dispatch("setCreds", { username: "", password: "" });
-      router.push("/");
-    },
-
     approveSuggestion: (id) => {
       store.dispatch("showLoading");
       axios.post(`suggestion/${id}`, {}, {

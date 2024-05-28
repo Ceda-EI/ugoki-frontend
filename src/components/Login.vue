@@ -24,7 +24,6 @@
 import { Form, Input, Button, Card  } from "ant-design-vue";
 import { onBeforeMount } from "vue";
 import store from "../store";
-import router from "../router";
 export default {
   name: "Login",
   components: {
@@ -34,7 +33,7 @@ export default {
     FormItem: Form.Item,
     Card
   },
-  data: function() {
+  data() {
     return {
       username: "",
       password: ""
@@ -52,14 +51,14 @@ export default {
         password: this.password
       };
       store.dispatch("setCreds", auth);
-      router.push("/suggestions");
+      this.$router.push("/suggestions");
     }
   },
   setup() {
     onBeforeMount(() => {
       const { username, password } = store.state.auth;
       if (username !== "" && password !== "")
-        router.push("/suggestions");
+        this.$router.push("/suggestions");
     });
   }
 }
